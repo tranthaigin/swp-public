@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragments/staff_layout :: layout(~{::postcheck_content})}">
+
+    <div th:fragment="postcheck_content">
+        <link rel="stylesheet" th:href="@{/css/post-check.css}" />
+
+        <div class="hero">
+            <div class="hero-inner">
+                <div>
+                    <h1>Perform Service Spa</h1>
+                    <p>Enter weight, temperature, visible conditions, and upload pet photos.</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="container">
+            <section class="card">
+                <header class="card-header">
+                    <div>
+                        <h2 class="title">Post Check / Report</h2>
+                    </div>
+                    <div class="tag">FORM</div>
+                </header>
+
+                <div class="card-body">
+                    <div th:if="${message}" class="note note-success" th:text="${message}"></div>
+                    <div th:if="${error}" class="note note-error" th:text="${error}"></div>
+
+                    <div class="summary" style="margin-bottom: 16px;">
+                        <div class="kv">
+                            <div class="k">Appointment</div>
+                            <div class="v" th:text="${context.appointmentCode}">APP-000123</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Pet</div>
+                            <div class="v" th:text="${context.petName}">Lucky</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Service</div>
+                            <div class="v" th:text="${context.serviceName ?: 'N/A'}">Service</div>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/staff/health-check/{appointmentId}/submit(appointmentId=${context.appointmentId},serviceLineId=${context.serviceLineId})}"
+                          th:object="${submitRequest}"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <div class="grid2">
+                            <div>
+                                <label for="weightKg">Weight (kg)</label>
+                                <input id="weightKg" type="number" step="0.01" min="0" th:field="*{weightKg}" required>
+                            </div>
+                            <div>
+                                <label for="temperature">Temperature (°C)</label>
+                                <input id="temperature" type="number" step="0.01" min="30" max="45" th:field="*{temperature}" required>
+                            </div>
+                        </div>
+
+                        <div class="grid2" style="margin-top:12px;">
+                            <div>
+                                <label for="conditionBefore">Condition Before</label>
+                                <textarea id="conditionBefore" th:field="*{conditionBefore}" placeholder="e.g. Skin normal, eyes clear"></textarea>
+                            </div>
+                            <div>
+                                <label for="conditionAfter">Condition After / Visual Check</label>
+                                <textarea id="conditionAfter" th:field="*{conditionAfter}" placeholder="e.g. Slight redness in left ear"></textarea>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:12px;">
+                            <label for="findings">Condition Notes / Findings</label>
+                            <textarea id="findings" th:field="*{findings}" placeholder="Detailed findings from basic check"></textarea>
+                        </div>
+
+                        <div style="margin-top:12px;">
+                            <label for="recommendations">Recommendations (for warning/abnormal cases)</label>
+                            <textarea id="recommendations" th:field="*{recommendations}" placeholder="e.g. Needs further blood test"></textarea>
+                        </div>
+
+                        <div style="margin-top:12px;" class="upload">
+                            <label for="photos">Evidence image(s)</label>
+                            <input id="photos" name="photos" type="file" accept="image/*" multiple />
+                            <small>At least one photo is required for Submit Report. Save Draft can be without photo.</small>
+                        </div>
+
+                        <div style="margin-top:12px;" class="upload">
+                            
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn btn-primary" type="submit">Submit Report</button>
+                            <button class="btn btn-ghost" type="submit"
+                                    th:formaction="@{/staff/health-check/{appointmentId}/draft(appointmentId=${context.appointmentId},serviceLineId=${context.serviceLineId})}"
+                                    formnovalidate>
+                                Save Draft
+                            </button>
+                            <a class="btn btn-secondary" th:href="@{/staff/appointment_detail(id=${context.appointmentId})}">Back</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</th:block>
+</html>

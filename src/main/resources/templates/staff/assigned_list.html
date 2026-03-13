@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{fragments/staff_layout :: layout(~{::page_content})}">
+
+    <div th:fragment="page_content">
+
+        <link rel="stylesheet" th:href="@{/css/assigned_list.css}">
+
+        <div class="hero">
+            <div class="hero-inner">
+                <div>
+                    <h1>Assigned Appointments</h1>
+                    <p>Manage appointments assigned to you.</p>
+                </div>
+                <div class="pill">LIST</div>
+            </div>
+        </div>
+
+        <main class="container">
+            <section class="card">
+                <header class="card-header">
+                    <div>
+                        <h2 class="title">Your assigned list</h2>
+                    </div>
+                    <div class="tag">STAFF</div>
+                </header>
+
+                <div class="card-body">
+
+                    <div th:if="${#lists.isEmpty(appointments)}" class="empty-state">
+                        <p th:if="${date == 'today'}">No tasks assigned for today.</p>
+                        <p th:unless="${date == 'today'}">No appointments are currently assigned to you.</p>
+                    </div>
+
+                    <div class="table-wrap" th:unless="${#lists.isEmpty(appointments)}">
+                        <table class="assigned-table">
+                            <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Date</th>
+                                <th>Pet</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th class="ta-center">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="app : ${appointments}">
+                                <td class="code" th:text="${app.appointmentCode}">APP-Code</td>
+                                <td th:text="${#temporals.format(app.appointmentDate, 'dd/MM/yyyy')}">Date</td>
+                                <td th:text="${app.pet.name} + ' (' + ${app.pet.petType} + ')'">Pet</td>
+                                <td th:text="${app.customer.fullName}">Customer</td>
+                                <td>
+                                    <span class="chip status"
+                                          th:text="${app.status}"
+                                          th:classappend="${'status-' + app.status.toLowerCase()}">
+                                        Status
+                                    </span>
+                                </td>
+                                <td class="ta-center action-cell">
+                                    <a class="btn btn-primary"
+                                       th:href="@{/staff/appointment_detail(id=${app.id})}">
+                                        View details
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="card">
+                <header class="card-header">
+                    <h2 class="title">Filters</h2>
+                </header>
+                <div class="card-body">
+                    <form th:action="@{/staff/assigned_list}" method="get">
+                        <div class="grid">
+                            <div>
+                                <label>Date</label>
+                                <select name="date">
+                                    <option value="">All Dates</option>
+                                    <option value="today" th:selected="${date == 'today'}">Today</option>
+                                    <option value="tomorrow" th:selected="${date == 'tomorrow'}">Tomorrow</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Status</label>
+                                <select name="status">
+                                    <option value="">All Statuses</option>
+                                    <option value="pending" th:selected="${status == 'pending'}">Pending</option>
+                                    <option value="confirmed" th:selected="${status == 'confirmed'}">Confirmed</option>
+                                    <option value="in_progress" th:selected="${status == 'in_progress'}">In Progress</option>
+                                    <option value="done" th:selected="${status == 'done'}">Done</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary" type="submit">Apply</button>
+                            <a th:href="@{/staff/assigned_list}" class="btn btn-ghost">Reset</a>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+</th:block>
+</html>
